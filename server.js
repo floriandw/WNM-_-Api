@@ -16,7 +16,9 @@ app.use(
 
 app.options('*', cors());
 
-app.get('/api/', (req, res) => res.status(200).send({ message: 'Hello World!'}));
+//TODO: Define Routes
+require('./routes/auth.route')(app);
+require('./routes/users.route')(app);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
