@@ -16,7 +16,7 @@ app.use(
 
 app.options('*', cors());
 
-app.get('/', (req, res) => res.status(200).send({ pmessage: 'Hello World!'}));
+app.get('/api/', (req, res) => res.status(200).send({ message: 'Hello World!'}));
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
