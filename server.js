@@ -19,6 +19,8 @@ app.options('*', cors());
 //TODO: Define Routes
 require('./routes/auth.route')(app);
 require('./routes/users.route')(app);
+require('./routes/categories.route')(app);
+require('./routes/todos.route')(app);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));

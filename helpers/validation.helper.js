@@ -21,5 +21,5 @@ module.exports = {
 
         if (errors.length > 0) return {kind: 'NOK', errors: errors};
         return {kind: "OK"};
-    }
+    },
 }

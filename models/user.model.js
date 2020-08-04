@@ -25,6 +25,23 @@ User.getUserById = (id, callback) => {
     });
 }
 
+User.getUserByUsername = (username, callback) => {
+    sql.query("SELECT * FROM users WHERE username = ?", username, (err, res) => {
+        if (err) {
+            console.log(err);
+            callback(null, err);
+            return;
+        }
+
+        if (res.length) {
+            callback(null, res[0]);
+            return;
+        }
+
+        callback({kind: 'not_found'}, null);
+    });
+}
+
 User.resetPassword = (id, user, callback) => {
     const passwordStrength = checkPasswordStrength(user.password);
 
@@ -75,22 +92,7 @@ User.deleteAccount = (id, callback) => {
     });
 }
 
-User.getUserByUsername = (username, callback) => {
-    sql.query("SELECT * FROM users WHERE username = ?", username, (err, res) => {
-        if (err) {
-            console.log(err);
-            callback(null, err);
-            return;
-        }
 
-        if (res.length) {
-            callback(null, res[0]);
-            return;
-        }
-
-        callback({kind: 'not_found'}, null);
-    })
-}
 
 User.login = (username, plainTextPassword, hashedPassword, callback) => {
     bcrypt.compare(plainTextPassword, hashedPassword, (err, match) => {
