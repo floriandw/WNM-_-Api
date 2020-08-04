@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const { isValidSubmit } = require('../helpers/validation.helper');
+const jwt = require('../middleware/jwt.middleware');
 
 exports.login = (req, res) => {
     const { username, password } = req.body;
@@ -35,8 +36,8 @@ exports.login = (req, res) => {
                     res.send({
                         id: user.id,
                         username: data.username,
-                        // token: data.token,
-                        // expiresIn: data.expiresIn
+                        token: jwt.generateJWToken(),
+                        expiresIn: 24 * 60 * 60 * 1000
                     });
                 }
             })

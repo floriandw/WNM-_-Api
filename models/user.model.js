@@ -1,5 +1,6 @@
 const sql = require('../db/db');
 const bcrypt = require('bcrypt');
+const jwt = require('../middleware/jwt.middleware');
 const { createUUID } = require('../helpers/functions.helper');
 const { checkPasswordStrength } = require('../helpers/validation.helper');
 
@@ -126,7 +127,6 @@ User.register = (newUser, callback) => {
     }
 
     const id = createUUID();
-    // jwt + expiresIn
 
     bcrypt.hash(newUser.password, 10, (err, hash) => {
         if (err) throw err;
@@ -144,8 +144,9 @@ User.register = (newUser, callback) => {
 
                 callback(null, {
                     id: id,
-                    username: newUser.username
-                    // jwt + expiresIn
+                    username: newUser.username,
+                    token: jwt.generateJWToken(),
+                    expiresIn: 24 * 60 * 60 * 1000
                 });
             }            
         );
