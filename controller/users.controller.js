@@ -1,4 +1,15 @@
 const User = require('../models/user.model');
+const Todo = require('../models/todo.model');
+
+exports.getUsers = (req, res) => {
+    User.getUsers((err, users) => {
+        if (err) {
+            res.status(500)
+                .send({ message: 'Something went terribly wrong...' });
+        }
+        else res.send(users);
+    });
+}
 
 exports.getUserById = (req, res) => {
     const id = req.params.id;
@@ -14,12 +25,17 @@ exports.getUserById = (req, res) => {
                     .send({message: "Something went terribly wrong..."});
             }
         }
-        else res.send({
-            id: data.id,
-            username: data.username
-        });
-       
-    })
+        else {
+            Todo.getTodosByUserId(id, (err, todos) => {
+                if (err) res.status(500).send({message: "Something went terribly wrong..."});
+                else res.send({
+                        id: data.id,
+                        username: data.username,
+                        todos: todos
+                    });
+            });
+        }
+    });
 }
 
 exports.getUserByName = (req, res) => {   

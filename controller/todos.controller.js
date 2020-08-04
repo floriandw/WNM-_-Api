@@ -38,7 +38,7 @@ exports.getTodoById = (req, res) => {
 }
 
 exports.addToDo = (req, res) => {
-    const { todo, deadline, categoryId} = req.body;
+    const { todo, deadline, categoryId, userIds } = req.body;
 
     // Checks to see if the form is filed in
     if (
@@ -52,15 +52,15 @@ exports.addToDo = (req, res) => {
     const newTodo = new Todo({
         todo: todo,
         createdAt: new Date().toLocaleString(),
-        updatedAt:  new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString(),
         deadline: new Date(deadline).toLocaleString(),
-        categoryId: categoryId
-        
-    })
+        categoryId: categoryId,
+        users: userIds
+    });
 
     Todo.addToDo(newTodo, (err, data) => {
-        if (err) res.status(500).send({message: "Something went terribly wrong..."});
-        else res.status(201).send(data);               
+        if (err) return res.status(500).send({message: "Something went terribly wrong..."});
+        else return res.status(201).send(data);
     });
 }
 
@@ -79,7 +79,8 @@ exports.updateTodo = (req, res) => {
         todo: req.body.todo,
         updatedAt: new Date().toLocaleString(),
         deadline: new Date(req.body.deadline).toLocaleString(),
-        categoryId: req.body.categoryId
+        categoryId: req.body.categoryId,
+        users: req.body.userIds
     })
 
     Todo.updateTodo(id, todo, (err, data) => {

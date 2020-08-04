@@ -5,5 +5,4 @@ module.exports = app => {
     app.get('/api/categories/:id', category.getCategoryById);
     app.put('/api/categories/:id', category.updateCategory);
     app.post('/api/categories/', category.addCategory);
-    app.delete('/api/categories/:id', category.deleteCategory);
 }

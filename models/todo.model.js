@@ -6,6 +6,7 @@ const Todo = function(todo) {
     this.categoryId = todo.categoryId;
     this.createdAt = todo.createdAt;
     this.updatedAt = todo.updatedAt;
+    this.users = todo.users;
 }
 
 Todo.getTodos = callback => {
@@ -37,6 +38,23 @@ Todo.getTodoById = (id, callback) => {
     });
 }
 
+Todo.getTodosByUserId = (userId, callback) => {
+    sql.query(
+        "SELECT * FROM todos INNER JOIN users_has_todos ON users_has_todos.todoId = todos.id WHERE users_has_todos.userId = ?", userId, 
+        (err, res) => {
+            if (err) {
+                console.log(err);
+                callback(err, null);
+                return;
+            }
+
+            callback(null, {
+                todos: res
+            });
+        }
+    );
+};
+
 Todo.addToDo = (newTodo, callback) => {
     sql.query(
         "INSERT INTO todos VALUES (?, ?, ?, ?, ?,?)",
@@ -47,14 +65,32 @@ Todo.addToDo = (newTodo, callback) => {
                 callback(err, null);
                 return;
             }
-            
+
+            const todoId = res.insertId;
+            const userIds = newTodo.users;
+
+            userIds.forEach(userId => {
+                sql.query(
+                    "INSERT INTO users_has_todos VALUES (?, ?)",
+                    [userId, todoId],
+                    (err, res) => {
+                        if (err) {
+                            console.log(err);
+                            callback(err, null);
+                            return;
+                        }
+                    }
+                )
+            });
+
             callback(null, {
-                id: res.insertId,
+                id: todoId,
                 todo: newTodo.todo,
                 createdAt: newTodo.createdAt, 
                 updatedAt: newTodo.updatedAt,
                 deadline: newTodo.deadline,
-                categoryId: newTodo.categoryId
+                categoryId: newTodo.categoryId,
+                users: userIds
             });
         }            
     );
@@ -76,26 +112,55 @@ Todo.updateTodo = (id, todo, callback) => {
                 return;
             }
 
+            const userIds = todo.users;
+
+            userIds.forEach(userId => {
+                sql.query(
+                    "INSERT INTO users_has_todos VALUES (?, ?)",
+                    [userId, id],
+                    (err, res) => {
+                        if (err) {
+                            console.log(err);
+                            callback(err, null);
+                            return;
+                        }
+                    }
+                )
+            });
+
             callback(null, {id: id, ...todo});
         }
     );
 }
 
 Todo.deleteTodo = (id, callback) => {
-    sql.query("DELETE FROM todos WHERE id = ?", id, (err, res) => {
-        if (err) {
-            console.log(err);
-            callback(null, err);
-            return;
-        }
+    sql.query(
+        "DELETE FROM users_has_todos WHERE todoId = ?",
+        id,
+        (err, res) => {
 
-        if (res.affectedRows == 0) {
-            callback({kind: "not_found"}, null);
-            return;
-        }
+            if (err) {
+                console.log(err);
+                callback(null, err);
+                return;
+            }
 
-        callback(null, res);
-    });
+            sql.query("DELETE FROM todos WHERE id = ?", id, (err, res) => {
+                if (err) {
+                    console.log(err);
+                    callback(null, err);
+                    return;
+                }
+
+                if (res.affectedRows == 0) {
+                    callback({kind: "not_found"}, null);
+                    return;
+                }
+
+                callback(null, res);
+            }
+        );
+    })
 }
 
 module.exports = Todo;

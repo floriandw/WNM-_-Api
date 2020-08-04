@@ -8,6 +8,18 @@ const User = function(user) {
     this.password = user.password;
 }
 
+User.getUsers = callback => {
+    sql.query("SELECT * FROM users", (err, res) => {
+        if (err) {
+            console.log(err);
+            callback(err, null);
+            return;
+        }
+
+        callback(null, res);
+    });
+}
+
 User.getUserById = (id, callback) => {
     sql.query("SELECT * FROM users WHERE id = ?", id, (err, res) => {
         if (err) {

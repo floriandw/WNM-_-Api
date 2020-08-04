@@ -91,32 +91,6 @@ Category.updateCategory = (id, category, callback) => {
             callback(null, {id: id, ...category});
         }
     );
-
-}
-
-Category.deleteCategory = (id, callback) => {
-    sql.query("DELETE FROM todos where categoryId = ?", id, (err, res) => {
-        if (err) {
-            console.log(err);
-            callback(null, err);
-            return;
-        }
-        
-        sql.query("DELETE FROM categories WHERE id = ?", id, (err, res) => {
-            if (err) {
-                console.log(err);
-                callback(null, err);
-                return;
-            }
-            
-            if (res.affectedRows == 0) {
-                callback({kind: "not_found"}, null);
-                return;
-            }
-            
-            callback(null, res);
-        });
-    });
 }
 
 module.exports = Category;
